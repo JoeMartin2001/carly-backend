@@ -1,12 +1,32 @@
-services:
-  gateway:
-    build: ./apps/gateway
-    ports:
-      - "3000:3000"
-    depends_on:
-      - user-service
+version: "3.9"
 
+services:
   user-service:
-    build: ./apps/user-service
+    build:
+      context: .
+      dockerfile: Dockerfile.user-service
+    container_name: user-service
     ports:
       - "50051:50051"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - USER_SERVICE_URL=user-service:50051
+    depends_on:
+      - user-service
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  backend:
+    driver: bridge

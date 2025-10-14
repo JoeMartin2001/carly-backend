@@ -25,6 +25,8 @@
     }
   },
   "compilerOptions": {
-    "tsConfigPath": "apps/gateway/tsconfig.json"
+    "tsConfigPath": "apps/gateway/tsconfig.json",
+    "assets": ["**/*.proto", "**/**/*.proto"],
+    "watchAssets": true
   }
 }

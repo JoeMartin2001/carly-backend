@@ -7,8 +7,12 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:gateway": "nest build gateway",
+    "build:user-service": "nest build user-service",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start:gateway": "nest start gateway",
     "start:gateway:dev": "nest start gateway --watch",
+    "start:user-service": "nest start user-service",
     "start:user:dev": "nest start user-service --watch",
     "start:all": "npm-run-all --parallel start:*:dev",
     "start": "nest start",
