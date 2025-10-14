@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src", // ✅ relative to this file
+    "outDir": "../../dist/apps/user-service", // ✅ target output
+    "baseUrl": "./"
+  },
+  "include": ["src/**/*"]
+}

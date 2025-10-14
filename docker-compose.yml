@@ -1,0 +1,12 @@
+services:
+  gateway:
+    build: ./apps/gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+
+  user-service:
+    build: ./apps/user-service
+    ports:
+      - "50051:50051"
