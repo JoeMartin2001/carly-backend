@@ -21,32 +21,39 @@ import {
 
 export const protobufPackage = "user";
 
-export interface GetUserByIdRequest {
+export interface FindOneById {
   id: string;
 }
 
-export interface UserResponse {
+export interface FindAllRequest {
+}
+
+export interface FindAllResponse {
+  users: User[];
+}
+
+export interface User {
   id: string;
   name: string;
   email: string;
 }
 
-function createBaseGetUserByIdRequest(): GetUserByIdRequest {
+function createBaseFindOneById(): FindOneById {
   return { id: "" };
 }
 
-export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
-  encode(message: GetUserByIdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const FindOneById: MessageFns<FindOneById> = {
+  encode(message: FindOneById, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUserByIdRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): FindOneById {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetUserByIdRequest();
+    const message = createBaseFindOneById();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -67,11 +74,11 @@ export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
     return message;
   },
 
-  fromJSON(object: any): GetUserByIdRequest {
+  fromJSON(object: any): FindOneById {
     return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
   },
 
-  toJSON(message: GetUserByIdRequest): unknown {
+  toJSON(message: FindOneById): unknown {
     const obj: any = {};
     if (message.id !== "") {
       obj.id = message.id;
@@ -79,22 +86,123 @@ export const GetUserByIdRequest: MessageFns<GetUserByIdRequest> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<GetUserByIdRequest>, I>>(base?: I): GetUserByIdRequest {
-    return GetUserByIdRequest.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<FindOneById>, I>>(base?: I): FindOneById {
+    return FindOneById.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<GetUserByIdRequest>, I>>(object: I): GetUserByIdRequest {
-    const message = createBaseGetUserByIdRequest();
+  fromPartial<I extends Exact<DeepPartial<FindOneById>, I>>(object: I): FindOneById {
+    const message = createBaseFindOneById();
     message.id = object.id ?? "";
     return message;
   },
 };
 
-function createBaseUserResponse(): UserResponse {
+function createBaseFindAllRequest(): FindAllRequest {
+  return {};
+}
+
+export const FindAllRequest: MessageFns<FindAllRequest> = {
+  encode(_: FindAllRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FindAllRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFindAllRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): FindAllRequest {
+    return {};
+  },
+
+  toJSON(_: FindAllRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FindAllRequest>, I>>(base?: I): FindAllRequest {
+    return FindAllRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FindAllRequest>, I>>(_: I): FindAllRequest {
+    const message = createBaseFindAllRequest();
+    return message;
+  },
+};
+
+function createBaseFindAllResponse(): FindAllResponse {
+  return { users: [] };
+}
+
+export const FindAllResponse: MessageFns<FindAllResponse> = {
+  encode(message: FindAllResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.users) {
+      User.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FindAllResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFindAllResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.users.push(User.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FindAllResponse {
+    return { users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => User.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: FindAllResponse): unknown {
+    const obj: any = {};
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => User.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FindAllResponse>, I>>(base?: I): FindAllResponse {
+    return FindAllResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FindAllResponse>, I>>(object: I): FindAllResponse {
+    const message = createBaseFindAllResponse();
+    message.users = object.users?.map((e) => User.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUser(): User {
   return { id: "", name: "", email: "" };
 }
 
-export const UserResponse: MessageFns<UserResponse> = {
-  encode(message: UserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const User: MessageFns<User> = {
+  encode(message: User, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
@@ -107,10 +215,10 @@ export const UserResponse: MessageFns<UserResponse> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UserResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): User {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUserResponse();
+    const message = createBaseUser();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -147,7 +255,7 @@ export const UserResponse: MessageFns<UserResponse> = {
     return message;
   },
 
-  fromJSON(object: any): UserResponse {
+  fromJSON(object: any): User {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       name: isSet(object.name) ? globalThis.String(object.name) : "",
@@ -155,7 +263,7 @@ export const UserResponse: MessageFns<UserResponse> = {
     };
   },
 
-  toJSON(message: UserResponse): unknown {
+  toJSON(message: User): unknown {
     const obj: any = {};
     if (message.id !== "") {
       obj.id = message.id;
@@ -169,11 +277,11 @@ export const UserResponse: MessageFns<UserResponse> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<UserResponse>, I>>(base?: I): UserResponse {
-    return UserResponse.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<User>, I>>(base?: I): User {
+    return User.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<UserResponse>, I>>(object: I): UserResponse {
-    const message = createBaseUserResponse();
+  fromPartial<I extends Exact<DeepPartial<User>, I>>(object: I): User {
+    const message = createBaseUser();
     message.id = object.id ?? "";
     message.name = object.name ?? "";
     message.email = object.email ?? "";
@@ -183,36 +291,58 @@ export const UserResponse: MessageFns<UserResponse> = {
 
 export type UserServiceService = typeof UserServiceService;
 export const UserServiceService = {
-  getUserById: {
-    path: "/user.UserService/GetUserById",
+  findOne: {
+    path: "/user.UserService/FindOne",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: GetUserByIdRequest): Buffer => Buffer.from(GetUserByIdRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetUserByIdRequest => GetUserByIdRequest.decode(value),
-    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+    requestSerialize: (value: FindOneById): Buffer => Buffer.from(FindOneById.encode(value).finish()),
+    requestDeserialize: (value: Buffer): FindOneById => FindOneById.decode(value),
+    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    responseDeserialize: (value: Buffer): User => User.decode(value),
+  },
+  findAll: {
+    path: "/user.UserService/FindAll",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: FindAllRequest): Buffer => Buffer.from(FindAllRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): FindAllRequest => FindAllRequest.decode(value),
+    responseSerialize: (value: FindAllResponse): Buffer => Buffer.from(FindAllResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): FindAllResponse => FindAllResponse.decode(value),
   },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
-  getUserById: handleUnaryCall<GetUserByIdRequest, UserResponse>;
+  findOne: handleUnaryCall<FindOneById, User>;
+  findAll: handleUnaryCall<FindAllRequest, FindAllResponse>;
 }
 
 export interface UserServiceClient extends Client {
-  getUserById(
-    request: GetUserByIdRequest,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
-  ): ClientUnaryCall;
-  getUserById(
-    request: GetUserByIdRequest,
+  findOne(request: FindOneById, callback: (error: ServiceError | null, response: User) => void): ClientUnaryCall;
+  findOne(
+    request: FindOneById,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: User) => void,
   ): ClientUnaryCall;
-  getUserById(
-    request: GetUserByIdRequest,
+  findOne(
+    request: FindOneById,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: UserResponse) => void,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllRequest,
+    callback: (error: ServiceError | null, response: FindAllResponse) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: FindAllResponse) => void,
+  ): ClientUnaryCall;
+  findAll(
+    request: FindAllRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: FindAllResponse) => void,
   ): ClientUnaryCall;
 }
 

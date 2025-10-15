@@ -1,9 +1,7 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": "src", // ✅ relative to this file
-    "outDir": "../../dist/apps/user-service", // ✅ target output
-    "baseUrl": "./"
+    "outDir": "../../dist/apps/user-service"
   },
   "include": ["src/**/*"]
 }

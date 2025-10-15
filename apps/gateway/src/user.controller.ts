@@ -1,12 +1,11 @@
 import { Controller, Get, Inject, OnModuleInit, Param } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom, Observable } from 'rxjs';
-
-type IUser = { id: string; name: string; email: string };
+import type { User } from '@proto/user';
 
 interface IUserService {
-  findOne(data: { id: string }): Observable<IUser>;
-  findAll(data: any): Observable<IUser[]>;
+  findOne(data: { id: string }): Observable<User>;
+  findAll(data: any): Observable<User[]>;
 }
 
 @Controller('users')
