@@ -12,4 +12,13 @@ export class UserController {
 
     return this.userService.findOne(data.id);
   }
+
+  @GrpcMethod('UserService', 'FindAll')
+  findAll(data: any) {
+    console.log(`FindAll users: ${data}`);
+
+    const users = this.userService.findAll();
+
+    return { users };
+  }
 }

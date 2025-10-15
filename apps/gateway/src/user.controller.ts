@@ -1,11 +1,12 @@
-import { Controller, Get, Query, Inject, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, Inject, OnModuleInit, Param } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
+
+type IUser = { id: string; name: string; email: string };
 
 interface IUserService {
-  findOne(data: {
-    id: string;
-  }): Observable<{ id: string; name: string; email: string }>;
+  findOne(data: { id: string }): Observable<IUser>;
+  findAll(data: any): Observable<IUser[]>;
 }
 
 @Controller('users')
@@ -19,20 +20,16 @@ export class UserController implements OnModuleInit {
   }
 
   @Get()
-  async getUser(@Query('id') id: string) {
-    const result = await this.userService.findOne({ id }).toPromise();
+  async getUsers() {
+    const users = await lastValueFrom(this.userService.findAll({}));
 
-    return result;
+    return users;
   }
 
-  @Get('test')
-  async testGrpc(@Query('id') id: string) {
-    try {
-      const result = await this.userService.findOne({ id }).toPromise();
-      return result;
-    } catch (e) {
-      console.error(e);
-      return { error: e as string };
-    }
+  @Get(':id')
+  async getUser(@Param('id') id: string) {
+    const result = await lastValueFrom(this.userService.findOne({ id }));
+
+    return result;
   }
 }

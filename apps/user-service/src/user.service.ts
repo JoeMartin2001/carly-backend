@@ -9,4 +9,19 @@ export class UserService {
       email: 'john.doe@example.com',
     };
   }
+
+  findAll() {
+    return [
+      {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+      },
+      {
+        id: '2',
+        name: 'Mike',
+        email: 'mike.doe@example.com',
+      },
+    ];
+  }
 }
