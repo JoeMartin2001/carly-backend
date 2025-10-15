@@ -2,7 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { ReflectionService } from '@grpc/reflection';
+import {
+  HealthImplementation,
+  protoPath as healthCheckProtoPath,
+} from 'grpc-health-check';
+import { Server } from '@grpc/grpc-js';
 
 async function bootstrap() {
   const protoPath = join(process.cwd(), 'libs/proto/auth.proto');
@@ -13,11 +17,15 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         package: 'auth',
-        protoPath: protoPath,
+        protoPath: [healthCheckProtoPath, protoPath],
         url: process.env.GRPC_BIND_URL || '0.0.0.0:50052',
-        onLoadPackageDefinition: (pkg, server) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          new ReflectionService(pkg).addToServer(server);
+        onLoadPackageDefinition: (_pkg, server: Server) => {
+          const healthImpl = new HealthImplementation({
+            '': 'UNKNOWN',
+          });
+
+          healthImpl.addToServer(server);
+          healthImpl.setStatus('', 'SERVING');
         },
       },
     },
