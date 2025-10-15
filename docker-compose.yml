@@ -2,7 +2,7 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: Dockerfile.user-service
+      dockerfile: docker/Dockerfile.user-service
     ports:
       - "50051:50051"
     environment:
@@ -13,7 +13,7 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: Dockerfile.auth-service
+      dockerfile: docker/Dockerfile.auth-service
     ports:
       - "50052:50052"
     environment:
@@ -24,7 +24,7 @@ services:
   gateway:
     build:
       context: .
-      dockerfile: Dockerfile.gateway
+      dockerfile: docker/Dockerfile.gateway
     ports:
       - "3000:3000"
     environment:
