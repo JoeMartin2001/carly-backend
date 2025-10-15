@@ -1,0 +1,53 @@
+services:
+  gateway:
+    image: node:22-alpine
+    working_dir: /usr/src/app
+    command: sh -c "yarn install && yarn start:gateway:dev"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - USER_SERVICE_URL=user-service:50051
+      - AUTH_SERVICE_URL=auth-service:50052
+    depends_on:
+      - user-service
+      - auth-service
+    networks:
+      - backend
+
+  user-service:
+    image: node:22-alpine
+    working_dir: /usr/src/app
+    command: sh -c "yarn install && yarn start:user:dev"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "50051:50051"
+    environment:
+      - NODE_ENV=development
+      - GRPC_BIND_URL=0.0.0.0:50051
+    networks:
+      - backend
+
+  auth-service:
+    image: node:22-alpine
+    working_dir: /usr/src/app
+    command: sh -c "yarn install && yarn start:auth:dev"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "50052:50052"
+    environment:
+      - NODE_ENV=development
+      - GRPC_BIND_URL=0.0.0.0:50052
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

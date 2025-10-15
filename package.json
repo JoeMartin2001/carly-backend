@@ -15,6 +15,8 @@
     "start:gateway:dev": "nest start gateway --watch",
     "start:user-service": "nest start user-service",
     "start:user:dev": "nest start user-service --watch",
+    "start:auth-service": "nest start auth-service",
+    "start:auth:dev": "nest start auth-service --watch",
     "start:all": "npm-run-all --parallel start:*:dev",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -27,6 +29,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "compose:up": "docker-compose up --build -d",
+    "docker-up:local": "docker compose -f docker-compose.dev.yml up",
+    "docker-up:prod": "docker compose up --build",
     "compose:down": "docker-compose down",
     "compose:restart": "docker-compose down && docker-compose up --build -d",
     "proto:generate": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=libs/proto/gen --ts_proto_opt=outputServices=grpc-js,outputClientImpl=grpc-js,esModuleInterop=true,forceLong=string --proto_path=libs/proto libs/proto/*.proto"

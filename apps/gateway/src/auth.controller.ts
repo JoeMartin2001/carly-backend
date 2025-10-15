@@ -1,4 +1,10 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Inject,
+  Post,
+} from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom, Observable } from 'rxjs';
 import type {
@@ -27,7 +33,18 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginRequest: LoginRequest) {
+    console.log('📩 Received gRPC request:', loginRequest);
+
+    if (!loginRequest) {
+      throw new BadRequestException('Invalid request body');
+    }
+
+    if (!loginRequest.email || !loginRequest.password) {
+      throw new BadRequestException('Email and password are required');
+    }
+
     const result = await lastValueFrom(this.authService.login(loginRequest));
+
     return result;
   }
 }
