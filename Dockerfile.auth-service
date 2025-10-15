@@ -14,8 +14,8 @@ RUN yarn install --frozen-lockfile
 # Copy the entire repo (except files ignored by .dockerignore)
 COPY . .
 
-# Build user-service app
-RUN yarn build:user-service
+# Build auth-service app
+RUN yarn build:auth-service
 
 # ------------------------------------------
 # Stage 2: Runner
@@ -28,12 +28,13 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/libs/proto ./libs/proto
 
 # Copy compiled output
-COPY --from=builder /usr/src/app/dist/apps/user-service ./dist
+COPY --from=builder /usr/src/app/dist/apps/auth-service ./dist
 
 # Copy only package.json and yarn.lock for production deps
 COPY package.json yarn.lock ./
 
 RUN yarn install --production --frozen-lockfile
 
-EXPOSE 50051
+EXPOSE 50052
 CMD ["node", "dist/src/main.js"]
+    

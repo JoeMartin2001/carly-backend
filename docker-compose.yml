@@ -3,32 +3,38 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.user-service
-    container_name: user-service
     ports:
       - "50051:50051"
     environment:
-      - NODE_ENV=production
       - GRPC_BIND_URL=0.0.0.0:50051
     networks:
       - backend
-    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth-service
+    ports:
+      - "50052:50052"
+    environment:
+      - GRPC_BIND_URL=0.0.0.0:50052
+    networks:
+      - backend
 
   gateway:
     build:
       context: .
       dockerfile: Dockerfile.gateway
-    container_name: gateway
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - PORT=3000
       - USER_SERVICE_URL=user-service:50051
+      - AUTH_SERVICE_URL=auth-service:50052
     depends_on:
       - user-service
+      - auth-service
     networks:
       - backend
-    restart: unless-stopped
 
 networks:
   backend:

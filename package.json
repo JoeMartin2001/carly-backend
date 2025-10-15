@@ -9,6 +9,7 @@
     "build": "nest build",
     "build:gateway": "nest build gateway",
     "build:user-service": "nest build user-service",
+    "build:auth-service": "nest build auth-service",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:gateway": "nest start gateway",
     "start:gateway:dev": "nest start gateway --watch",
@@ -25,6 +26,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "compose:up": "docker-compose up --build -d",
+    "compose:down": "docker-compose down",
+    "compose:restart": "docker-compose down && docker-compose up --build -d",
     "proto:generate": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=libs/proto/gen --ts_proto_opt=outputServices=grpc-js,outputClientImpl=grpc-js,esModuleInterop=true,forceLong=string --proto_path=libs/proto libs/proto/*.proto"
   },
   "dependencies": {

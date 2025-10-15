@@ -1,7 +1,10 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/apps/user-service"
+    "baseUrl": "./",
+    "paths": {
+      "@proto/*": ["../../libs/proto/gen/*"]
+    }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "../../libs/**/*"]
 }

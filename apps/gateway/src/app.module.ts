@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { UserController } from './user.controller';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -18,9 +19,18 @@ import { UserController } from './user.controller';
           url: process.env.USER_SERVICE_URL,
         },
       },
+      {
+        name: 'AUTH_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'auth',
+          protoPath: join(process.cwd(), 'libs/proto/auth.proto'),
+          url: process.env.AUTH_SERVICE_URL,
+        },
+      },
     ]),
   ],
-  controllers: [AppController, UserController],
+  controllers: [AppController, UserController, AuthController],
   providers: [AppService],
 })
 export class AppModule {}

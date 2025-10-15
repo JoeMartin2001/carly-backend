@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserServiceClient = exports.UserServiceService = exports.UserResponse = exports.GetUserByIdRequest = exports.protobufPackage = void 0;
+exports.UserServiceClient = exports.UserServiceService = exports.User = exports.FindAllResponse = exports.FindAllRequest = exports.FindOneById = exports.protobufPackage = void 0;
 const wire_1 = require("@bufbuild/protobuf/wire");
 const grpc_js_1 = require("@grpc/grpc-js");
 exports.protobufPackage = "user";
-function createBaseGetUserByIdRequest() {
+function createBaseFindOneById() {
     return { id: "" };
 }
-exports.GetUserByIdRequest = {
+exports.FindOneById = {
     encode(message, writer = new wire_1.BinaryWriter()) {
         if (message.id !== "") {
             writer.uint32(10).string(message.id);
@@ -17,7 +17,7 @@ exports.GetUserByIdRequest = {
     decode(input, length) {
         const reader = input instanceof wire_1.BinaryReader ? input : new wire_1.BinaryReader(input);
         const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseGetUserByIdRequest();
+        const message = createBaseFindOneById();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -47,18 +47,106 @@ exports.GetUserByIdRequest = {
         return obj;
     },
     create(base) {
-        return exports.GetUserByIdRequest.fromPartial(base ?? {});
+        return exports.FindOneById.fromPartial(base ?? {});
     },
     fromPartial(object) {
-        const message = createBaseGetUserByIdRequest();
+        const message = createBaseFindOneById();
         message.id = object.id ?? "";
         return message;
     },
 };
-function createBaseUserResponse() {
+function createBaseFindAllRequest() {
+    return {};
+}
+exports.FindAllRequest = {
+    encode(_, writer = new wire_1.BinaryWriter()) {
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof wire_1.BinaryReader ? input : new wire_1.BinaryReader(input);
+        const end = length === undefined ? reader.len : reader.pos + length;
+        const message = createBaseFindAllRequest();
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+            }
+            if ((tag & 7) === 4 || tag === 0) {
+                break;
+            }
+            reader.skip(tag & 7);
+        }
+        return message;
+    },
+    fromJSON(_) {
+        return {};
+    },
+    toJSON(_) {
+        const obj = {};
+        return obj;
+    },
+    create(base) {
+        return exports.FindAllRequest.fromPartial(base ?? {});
+    },
+    fromPartial(_) {
+        const message = createBaseFindAllRequest();
+        return message;
+    },
+};
+function createBaseFindAllResponse() {
+    return { users: [] };
+}
+exports.FindAllResponse = {
+    encode(message, writer = new wire_1.BinaryWriter()) {
+        for (const v of message.users) {
+            exports.User.encode(v, writer.uint32(10).fork()).join();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof wire_1.BinaryReader ? input : new wire_1.BinaryReader(input);
+        const end = length === undefined ? reader.len : reader.pos + length;
+        const message = createBaseFindAllResponse();
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1: {
+                    if (tag !== 10) {
+                        break;
+                    }
+                    message.users.push(exports.User.decode(reader, reader.uint32()));
+                    continue;
+                }
+            }
+            if ((tag & 7) === 4 || tag === 0) {
+                break;
+            }
+            reader.skip(tag & 7);
+        }
+        return message;
+    },
+    fromJSON(object) {
+        return { users: globalThis.Array.isArray(object?.users) ? object.users.map((e) => exports.User.fromJSON(e)) : [] };
+    },
+    toJSON(message) {
+        const obj = {};
+        if (message.users?.length) {
+            obj.users = message.users.map((e) => exports.User.toJSON(e));
+        }
+        return obj;
+    },
+    create(base) {
+        return exports.FindAllResponse.fromPartial(base ?? {});
+    },
+    fromPartial(object) {
+        const message = createBaseFindAllResponse();
+        message.users = object.users?.map((e) => exports.User.fromPartial(e)) || [];
+        return message;
+    },
+};
+function createBaseUser() {
     return { id: "", name: "", email: "" };
 }
-exports.UserResponse = {
+exports.User = {
     encode(message, writer = new wire_1.BinaryWriter()) {
         if (message.id !== "") {
             writer.uint32(10).string(message.id);
@@ -74,7 +162,7 @@ exports.UserResponse = {
     decode(input, length) {
         const reader = input instanceof wire_1.BinaryReader ? input : new wire_1.BinaryReader(input);
         const end = length === undefined ? reader.len : reader.pos + length;
-        const message = createBaseUserResponse();
+        const message = createBaseUser();
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
@@ -128,10 +216,10 @@ exports.UserResponse = {
         return obj;
     },
     create(base) {
-        return exports.UserResponse.fromPartial(base ?? {});
+        return exports.User.fromPartial(base ?? {});
     },
     fromPartial(object) {
-        const message = createBaseUserResponse();
+        const message = createBaseUser();
         message.id = object.id ?? "";
         message.name = object.name ?? "";
         message.email = object.email ?? "";
@@ -139,14 +227,23 @@ exports.UserResponse = {
     },
 };
 exports.UserServiceService = {
-    getUserById: {
-        path: "/user.UserService/GetUserById",
+    findOne: {
+        path: "/user.UserService/FindOne",
         requestStream: false,
         responseStream: false,
-        requestSerialize: (value) => Buffer.from(exports.GetUserByIdRequest.encode(value).finish()),
-        requestDeserialize: (value) => exports.GetUserByIdRequest.decode(value),
-        responseSerialize: (value) => Buffer.from(exports.UserResponse.encode(value).finish()),
-        responseDeserialize: (value) => exports.UserResponse.decode(value),
+        requestSerialize: (value) => Buffer.from(exports.FindOneById.encode(value).finish()),
+        requestDeserialize: (value) => exports.FindOneById.decode(value),
+        responseSerialize: (value) => Buffer.from(exports.User.encode(value).finish()),
+        responseDeserialize: (value) => exports.User.decode(value),
+    },
+    findAll: {
+        path: "/user.UserService/FindAll",
+        requestStream: false,
+        responseStream: false,
+        requestSerialize: (value) => Buffer.from(exports.FindAllRequest.encode(value).finish()),
+        requestDeserialize: (value) => exports.FindAllRequest.decode(value),
+        responseSerialize: (value) => Buffer.from(exports.FindAllResponse.encode(value).finish()),
+        responseDeserialize: (value) => exports.FindAllResponse.decode(value),
     },
 };
 exports.UserServiceClient = (0, grpc_js_1.makeGenericClientConstructor)(exports.UserServiceService, "user.UserService");

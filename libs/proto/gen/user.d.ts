@@ -1,35 +1,55 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { type CallOptions, type ChannelCredentials, Client, type ClientOptions, type ClientUnaryCall, type handleUnaryCall, type Metadata, type ServiceError, type UntypedServiceImplementation } from "@grpc/grpc-js";
 export declare const protobufPackage = "user";
-export interface GetUserByIdRequest {
+export interface FindOneById {
     id: string;
 }
-export interface UserResponse {
+export interface FindAllRequest {
+}
+export interface FindAllResponse {
+    users: User[];
+}
+export interface User {
     id: string;
     name: string;
     email: string;
 }
-export declare const GetUserByIdRequest: MessageFns<GetUserByIdRequest>;
-export declare const UserResponse: MessageFns<UserResponse>;
+export declare const FindOneById: MessageFns<FindOneById>;
+export declare const FindAllRequest: MessageFns<FindAllRequest>;
+export declare const FindAllResponse: MessageFns<FindAllResponse>;
+export declare const User: MessageFns<User>;
 export type UserServiceService = typeof UserServiceService;
 export declare const UserServiceService: {
-    readonly getUserById: {
-        readonly path: "/user.UserService/GetUserById";
+    readonly findOne: {
+        readonly path: "/user.UserService/FindOne";
         readonly requestStream: false;
         readonly responseStream: false;
-        readonly requestSerialize: (value: GetUserByIdRequest) => Buffer;
-        readonly requestDeserialize: (value: Buffer) => GetUserByIdRequest;
-        readonly responseSerialize: (value: UserResponse) => Buffer;
-        readonly responseDeserialize: (value: Buffer) => UserResponse;
+        readonly requestSerialize: (value: FindOneById) => Buffer;
+        readonly requestDeserialize: (value: Buffer) => FindOneById;
+        readonly responseSerialize: (value: User) => Buffer;
+        readonly responseDeserialize: (value: Buffer) => User;
+    };
+    readonly findAll: {
+        readonly path: "/user.UserService/FindAll";
+        readonly requestStream: false;
+        readonly responseStream: false;
+        readonly requestSerialize: (value: FindAllRequest) => Buffer;
+        readonly requestDeserialize: (value: Buffer) => FindAllRequest;
+        readonly responseSerialize: (value: FindAllResponse) => Buffer;
+        readonly responseDeserialize: (value: Buffer) => FindAllResponse;
     };
 };
 export interface UserServiceServer extends UntypedServiceImplementation {
-    getUserById: handleUnaryCall<GetUserByIdRequest, UserResponse>;
+    findOne: handleUnaryCall<FindOneById, User>;
+    findAll: handleUnaryCall<FindAllRequest, FindAllResponse>;
 }
 export interface UserServiceClient extends Client {
-    getUserById(request: GetUserByIdRequest, callback: (error: ServiceError | null, response: UserResponse) => void): ClientUnaryCall;
-    getUserById(request: GetUserByIdRequest, metadata: Metadata, callback: (error: ServiceError | null, response: UserResponse) => void): ClientUnaryCall;
-    getUserById(request: GetUserByIdRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: UserResponse) => void): ClientUnaryCall;
+    findOne(request: FindOneById, callback: (error: ServiceError | null, response: User) => void): ClientUnaryCall;
+    findOne(request: FindOneById, metadata: Metadata, callback: (error: ServiceError | null, response: User) => void): ClientUnaryCall;
+    findOne(request: FindOneById, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: User) => void): ClientUnaryCall;
+    findAll(request: FindAllRequest, callback: (error: ServiceError | null, response: FindAllResponse) => void): ClientUnaryCall;
+    findAll(request: FindAllRequest, metadata: Metadata, callback: (error: ServiceError | null, response: FindAllResponse) => void): ClientUnaryCall;
+    findAll(request: FindAllRequest, metadata: Metadata, options: Partial<CallOptions>, callback: (error: ServiceError | null, response: FindAllResponse) => void): ClientUnaryCall;
 }
 export declare const UserServiceClient: {
     new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UserServiceClient;

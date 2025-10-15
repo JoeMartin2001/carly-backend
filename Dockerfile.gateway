@@ -21,9 +21,11 @@ WORKDIR /usr/src/app
 # ✅ copy proto files as runtime assets
 COPY --from=builder /usr/src/app/libs/proto ./libs/proto
 
+# Copy compiled output
 COPY --from=builder /usr/src/app/dist/apps/gateway ./dist
+
 COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
