@@ -3,7 +3,7 @@ import { type ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 
 interface IUserService {
-  getUserById(data: {
+  findOne(data: {
     id: string;
   }): Observable<{ id: string; name: string; email: string }>;
 }
@@ -20,7 +20,19 @@ export class UserController implements OnModuleInit {
 
   @Get()
   async getUser(@Query('id') id: string) {
-    const result = await this.userService.getUserById({ id }).toPromise();
+    const result = await this.userService.findOne({ id }).toPromise();
+
     return result;
+  }
+
+  @Get('test')
+  async testGrpc(@Query('id') id: string) {
+    try {
+      const result = await this.userService.findOne({ id }).toPromise();
+      return result;
+    } catch (e) {
+      console.error(e);
+      return { error: e as string };
+    }
   }
 }

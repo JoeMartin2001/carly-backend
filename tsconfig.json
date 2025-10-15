@@ -24,7 +24,7 @@
     "noFallthroughCasesInSwitch": false,
 
     "paths": {
-      "@proto/*": ["libs/proto/*"]
+      "@proto/*": ["libs/proto/gen/*"]
     }
   }
 }

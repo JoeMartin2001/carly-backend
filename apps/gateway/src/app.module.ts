@@ -15,7 +15,7 @@ import { UserController } from './user.controller';
         options: {
           package: 'user',
           protoPath: join(process.cwd(), 'libs/proto/user.proto'),
-          url: process.env.USER_SERVICE_URL || 'localhost:50051',
+          url: process.env.USER_SERVICE_URL,
         },
       },
     ]),
