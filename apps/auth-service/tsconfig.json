@@ -6,5 +6,11 @@
       "@proto/*": ["../../libs/proto/gen/*"]
     }
   },
-  "include": ["src/**/*", "../../libs/**/*"]
+  "include": [
+    "src/**/*",
+    "../../libs/**/*",
+    "../gateway/src/infra/config",
+    "../gateway/src/infra/constants",
+    "../gateway/src/infra/database"
+  ]
 }

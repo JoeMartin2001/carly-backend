@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 package user;
 
 service UserService {
@@ -21,4 +23,11 @@ message User {
   string id = 1;
   string name = 2;
   string email = 3;
+  string password = 4;
+  string avatarUrl = 5;
+  
+  google.protobuf.Timestamp createdAt = 6;
+  string createdBy = 7;
+  google.protobuf.Timestamp updatedAt = 8;
+  string updatedBy = 9;
 }

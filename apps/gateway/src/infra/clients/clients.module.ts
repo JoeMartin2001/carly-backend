@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import {
+  ClientsModule as NestClientsModule,
+  Transport,
+} from '@nestjs/microservices';
 import { join } from 'path';
-import { UserController } from './user.controller';
-import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    NestClientsModule.register([
       {
         name: 'USER_PACKAGE',
         transport: Transport.GRPC,
@@ -29,10 +27,6 @@ import { AuthController } from './auth.controller';
         },
       },
     ]),
-
-    // GqlModule,
   ],
-  controllers: [AppController, UserController, AuthController],
-  providers: [AppService],
 })
-export class AppModule {}
+export class ClientsModule {}

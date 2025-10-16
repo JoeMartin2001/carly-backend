@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "user";
 
@@ -36,6 +37,12 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string;
+  avatarUrl: string;
+  createdAt: Date | undefined;
+  createdBy: string;
+  updatedAt: Date | undefined;
+  updatedBy: string;
 }
 
 function createBaseFindOneById(): FindOneById {
@@ -198,7 +205,17 @@ export const FindAllResponse: MessageFns<FindAllResponse> = {
 };
 
 function createBaseUser(): User {
-  return { id: "", name: "", email: "" };
+  return {
+    id: "",
+    name: "",
+    email: "",
+    password: "",
+    avatarUrl: "",
+    createdAt: undefined,
+    createdBy: "",
+    updatedAt: undefined,
+    updatedBy: "",
+  };
 }
 
 export const User: MessageFns<User> = {
@@ -211,6 +228,24 @@ export const User: MessageFns<User> = {
     }
     if (message.email !== "") {
       writer.uint32(26).string(message.email);
+    }
+    if (message.password !== "") {
+      writer.uint32(34).string(message.password);
+    }
+    if (message.avatarUrl !== "") {
+      writer.uint32(42).string(message.avatarUrl);
+    }
+    if (message.createdAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.createdAt), writer.uint32(50).fork()).join();
+    }
+    if (message.createdBy !== "") {
+      writer.uint32(58).string(message.createdBy);
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(66).fork()).join();
+    }
+    if (message.updatedBy !== "") {
+      writer.uint32(74).string(message.updatedBy);
     }
     return writer;
   },
@@ -246,6 +281,54 @@ export const User: MessageFns<User> = {
           message.email = reader.string();
           continue;
         }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.password = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.avatarUrl = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.createdAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.createdBy = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 9: {
+          if (tag !== 74) {
+            break;
+          }
+
+          message.updatedBy = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -260,6 +343,12 @@ export const User: MessageFns<User> = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      avatarUrl: isSet(object.avatarUrl) ? globalThis.String(object.avatarUrl) : "",
+      createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
+      createdBy: isSet(object.createdBy) ? globalThis.String(object.createdBy) : "",
+      updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
+      updatedBy: isSet(object.updatedBy) ? globalThis.String(object.updatedBy) : "",
     };
   },
 
@@ -274,6 +363,24 @@ export const User: MessageFns<User> = {
     if (message.email !== "") {
       obj.email = message.email;
     }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.avatarUrl !== "") {
+      obj.avatarUrl = message.avatarUrl;
+    }
+    if (message.createdAt !== undefined) {
+      obj.createdAt = message.createdAt.toISOString();
+    }
+    if (message.createdBy !== "") {
+      obj.createdBy = message.createdBy;
+    }
+    if (message.updatedAt !== undefined) {
+      obj.updatedAt = message.updatedAt.toISOString();
+    }
+    if (message.updatedBy !== "") {
+      obj.updatedBy = message.updatedBy;
+    }
     return obj;
   },
 
@@ -285,6 +392,12 @@ export const User: MessageFns<User> = {
     message.id = object.id ?? "";
     message.name = object.name ?? "";
     message.email = object.email ?? "";
+    message.password = object.password ?? "";
+    message.avatarUrl = object.avatarUrl ?? "";
+    message.createdAt = object.createdAt ?? undefined;
+    message.createdBy = object.createdBy ?? "";
+    message.updatedAt = object.updatedAt ?? undefined;
+    message.updatedBy = object.updatedBy ?? "";
     return message;
   },
 };
@@ -363,6 +476,28 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = Math.trunc(date.getTime() / 1_000).toString();
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = (globalThis.Number(t.seconds) || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
+  return new globalThis.Date(millis);
+}
+
+function fromJsonTimestamp(o: any): Date {
+  if (o instanceof globalThis.Date) {
+    return o;
+  } else if (typeof o === "string") {
+    return new globalThis.Date(o);
+  } else {
+    return fromTimestamp(Timestamp.fromJSON(o));
+  }
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

@@ -6,5 +6,5 @@
       "@proto/*": ["../../libs/proto/gen/*"]
     }
   },
-  "include": ["src/**/*", "../../libs/**/*"]
+  "include": ["src/**/*", "../../libs/**/*", "src/infra/database"]
 }

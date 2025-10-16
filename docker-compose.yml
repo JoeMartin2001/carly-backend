@@ -3,10 +3,10 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.user-service
+    env_file:
+      - ./apps/user-service/.env.user
     ports:
       - "50051:50051"
-    environment:
-      - GRPC_BIND_URL=0.0.0.0:50051
     networks:
       - backend
 
@@ -14,10 +14,10 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.auth-service
+    env_file:
+      - ./apps/auth-service/.env.auth
     ports:
       - "50052:50052"
-    environment:
-      - GRPC_BIND_URL=0.0.0.0:50052
     networks:
       - backend
 
@@ -25,11 +25,10 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.gateway
+    env_file:
+      - ./apps/gateway/.env.gateway
     ports:
       - "3000:3000"
-    environment:
-      - USER_SERVICE_URL=user-service:50051
-      - AUTH_SERVICE_URL=auth-service:50052
     depends_on:
       - user-service
       - auth-service
