@@ -8,9 +8,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @GrpcMethod('AuthService', 'Login')
-  login(data: LoginRequest): AuthResponse {
+  async login(data: LoginRequest): Promise<AuthResponse> {
     console.log('📩 Received gRPC request:', data);
 
-    return this.authService.login(data);
+    return await this.authService.login(data);
   }
 }
