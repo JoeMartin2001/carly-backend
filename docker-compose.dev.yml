@@ -7,9 +7,9 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     env_file:
-      - ./apps/gateway/.env.gateway.dev
+      - ./config/gateway/.env.gateway.dev
     ports:
-      - "3000:3000"
+      - "4000:4000"
     depends_on:
       - user-service
       - auth-service
@@ -18,13 +18,13 @@ services:
 
   user-service:
     image: node:22-alpine
+    env_file:
+      - ./config/user-service/.env.user.dev
     working_dir: /usr/src/app
     command: sh -c "yarn install && yarn start:user:dev"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    env_file:
-      - ./apps/user-service/.env.user.dev
     ports:
       - "50051:50051"
     networks:
@@ -38,7 +38,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     env_file:
-      - ./apps/auth-service/.env.auth.dev
+      - ./config/auth-service/.env.auth.dev
     ports:
       - "50052:50052"
     networks:
