@@ -19,5 +19,6 @@ import { join } from 'path';
       },
     ]),
   ],
+  exports: [NestClientsModule],
 })
 export class ClientsModule {}

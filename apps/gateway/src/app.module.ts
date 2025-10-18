@@ -2,37 +2,12 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { join } from 'path';
-import { UserController } from './user.controller';
-import { AuthController } from './auth.controller';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'USER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'user',
-          protoPath: join(process.cwd(), 'libs/proto/user.proto'),
-          url: process.env.USER_SERVICE_URL,
-        },
-      },
-      {
-        name: 'AUTH_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'auth',
-          protoPath: join(process.cwd(), 'libs/proto/auth.proto'),
-          url: process.env.AUTH_SERVICE_URL,
-        },
-      },
-    ]),
-
-    // GqlModule,
-  ],
-  controllers: [AppController, UserController, AuthController],
+  imports: [UserModule, AuthModule],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

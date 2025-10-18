@@ -1,6 +1,12 @@
 import { ObjectType, Field, ID, HideField } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User as IUser } from '@proto/user';
 import { TableName } from 'src/infra/constants/TableName';
 
@@ -34,11 +40,11 @@ export class UserEntity implements IUser {
   avatarUrl!: string;
 
   @Field()
-  @Column({ default: new Date() })
+  @CreateDateColumn()
   createdAt!: Date;
 
   @Field()
-  @Column({ default: new Date() })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
   @Field()

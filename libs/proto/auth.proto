@@ -3,14 +3,16 @@ syntax = "proto3";
 package auth;
 
 service AuthService {
-  rpc Register (RegisterRequest) returns (AuthResponse);
-  rpc Login (LoginRequest) returns (AuthResponse);
-  rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse);
+  rpc Register (RegisterRequest) returns (AuthResponse) {};
+  rpc Login (LoginRequest) returns (AuthResponse) {};
+  rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse) {};
 }
 
 message RegisterRequest {
   string email = 1;
   string password = 2;
+  string name = 3;
+  optional string avatarUrl = 4;
 }
 
 message LoginRequest {

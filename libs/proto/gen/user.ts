@@ -22,8 +22,29 @@ import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "user";
 
+export interface FindUserResponse {
+  user?: User | undefined;
+}
+
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password: string;
+  avatarUrl?: string | undefined;
+}
+
+export interface UpdateUserRequest {
+  name?: string | undefined;
+  email?: string | undefined;
+  avatarUrl?: string | undefined;
+}
+
 export interface FindOneById {
   id: string;
+}
+
+export interface FindOneByEmail {
+  email: string;
 }
 
 export interface FindAllRequest {
@@ -44,6 +65,264 @@ export interface User {
   updatedAt: Date | undefined;
   updatedBy: string;
 }
+
+function createBaseFindUserResponse(): FindUserResponse {
+  return { user: undefined };
+}
+
+export const FindUserResponse: MessageFns<FindUserResponse> = {
+  encode(message: FindUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.user !== undefined) {
+      User.encode(message.user, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FindUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFindUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.user = User.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FindUserResponse {
+    return { user: isSet(object.user) ? User.fromJSON(object.user) : undefined };
+  },
+
+  toJSON(message: FindUserResponse): unknown {
+    const obj: any = {};
+    if (message.user !== undefined) {
+      obj.user = User.toJSON(message.user);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FindUserResponse>, I>>(base?: I): FindUserResponse {
+    return FindUserResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FindUserResponse>, I>>(object: I): FindUserResponse {
+    const message = createBaseFindUserResponse();
+    message.user = (object.user !== undefined && object.user !== null) ? User.fromPartial(object.user) : undefined;
+    return message;
+  },
+};
+
+function createBaseCreateUserRequest(): CreateUserRequest {
+  return { name: "", email: "", password: "", avatarUrl: undefined };
+}
+
+export const CreateUserRequest: MessageFns<CreateUserRequest> = {
+  encode(message: CreateUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.email !== "") {
+      writer.uint32(18).string(message.email);
+    }
+    if (message.password !== "") {
+      writer.uint32(26).string(message.password);
+    }
+    if (message.avatarUrl !== undefined) {
+      writer.uint32(34).string(message.avatarUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.password = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.avatarUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateUserRequest {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      avatarUrl: isSet(object.avatarUrl) ? globalThis.String(object.avatarUrl) : undefined,
+    };
+  },
+
+  toJSON(message: CreateUserRequest): unknown {
+    const obj: any = {};
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.avatarUrl !== undefined) {
+      obj.avatarUrl = message.avatarUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreateUserRequest>, I>>(base?: I): CreateUserRequest {
+    return CreateUserRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreateUserRequest>, I>>(object: I): CreateUserRequest {
+    const message = createBaseCreateUserRequest();
+    message.name = object.name ?? "";
+    message.email = object.email ?? "";
+    message.password = object.password ?? "";
+    message.avatarUrl = object.avatarUrl ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateUserRequest(): UpdateUserRequest {
+  return { name: undefined, email: undefined, avatarUrl: undefined };
+}
+
+export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
+  encode(message: UpdateUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.name !== undefined) {
+      writer.uint32(10).string(message.name);
+    }
+    if (message.email !== undefined) {
+      writer.uint32(18).string(message.email);
+    }
+    if (message.avatarUrl !== undefined) {
+      writer.uint32(34).string(message.avatarUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.avatarUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateUserRequest {
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : undefined,
+      email: isSet(object.email) ? globalThis.String(object.email) : undefined,
+      avatarUrl: isSet(object.avatarUrl) ? globalThis.String(object.avatarUrl) : undefined,
+    };
+  },
+
+  toJSON(message: UpdateUserRequest): unknown {
+    const obj: any = {};
+    if (message.name !== undefined) {
+      obj.name = message.name;
+    }
+    if (message.email !== undefined) {
+      obj.email = message.email;
+    }
+    if (message.avatarUrl !== undefined) {
+      obj.avatarUrl = message.avatarUrl;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(base?: I): UpdateUserRequest {
+    return UpdateUserRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(object: I): UpdateUserRequest {
+    const message = createBaseUpdateUserRequest();
+    message.name = object.name ?? undefined;
+    message.email = object.email ?? undefined;
+    message.avatarUrl = object.avatarUrl ?? undefined;
+    return message;
+  },
+};
 
 function createBaseFindOneById(): FindOneById {
   return { id: "" };
@@ -99,6 +378,64 @@ export const FindOneById: MessageFns<FindOneById> = {
   fromPartial<I extends Exact<DeepPartial<FindOneById>, I>>(object: I): FindOneById {
     const message = createBaseFindOneById();
     message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseFindOneByEmail(): FindOneByEmail {
+  return { email: "" };
+}
+
+export const FindOneByEmail: MessageFns<FindOneByEmail> = {
+  encode(message: FindOneByEmail, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.email !== "") {
+      writer.uint32(10).string(message.email);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FindOneByEmail {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFindOneByEmail();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FindOneByEmail {
+    return { email: isSet(object.email) ? globalThis.String(object.email) : "" };
+  },
+
+  toJSON(message: FindOneByEmail): unknown {
+    const obj: any = {};
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<FindOneByEmail>, I>>(base?: I): FindOneByEmail {
+    return FindOneByEmail.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<FindOneByEmail>, I>>(object: I): FindOneByEmail {
+    const message = createBaseFindOneByEmail();
+    message.email = object.email ?? "";
     return message;
   },
 };
@@ -410,8 +747,8 @@ export const UserServiceService = {
     responseStream: false,
     requestSerialize: (value: FindOneById): Buffer => Buffer.from(FindOneById.encode(value).finish()),
     requestDeserialize: (value: Buffer): FindOneById => FindOneById.decode(value),
-    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
-    responseDeserialize: (value: Buffer): User => User.decode(value),
+    responseSerialize: (value: FindUserResponse): Buffer => Buffer.from(FindUserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): FindUserResponse => FindUserResponse.decode(value),
   },
   findAll: {
     path: "/user.UserService/FindAll",
@@ -422,25 +759,58 @@ export const UserServiceService = {
     responseSerialize: (value: FindAllResponse): Buffer => Buffer.from(FindAllResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): FindAllResponse => FindAllResponse.decode(value),
   },
+  findByEmail: {
+    path: "/user.UserService/FindByEmail",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: FindOneByEmail): Buffer => Buffer.from(FindOneByEmail.encode(value).finish()),
+    requestDeserialize: (value: Buffer): FindOneByEmail => FindOneByEmail.decode(value),
+    responseSerialize: (value: FindUserResponse): Buffer => Buffer.from(FindUserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): FindUserResponse => FindUserResponse.decode(value),
+  },
+  createUser: {
+    path: "/user.UserService/CreateUser",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: CreateUserRequest): Buffer => Buffer.from(CreateUserRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateUserRequest => CreateUserRequest.decode(value),
+    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    responseDeserialize: (value: Buffer): User => User.decode(value),
+  },
+  updateUser: {
+    path: "/user.UserService/UpdateUser",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateUserRequest): Buffer => Buffer.from(UpdateUserRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UpdateUserRequest => UpdateUserRequest.decode(value),
+    responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
+    responseDeserialize: (value: Buffer): User => User.decode(value),
+  },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
-  findOne: handleUnaryCall<FindOneById, User>;
+  findOne: handleUnaryCall<FindOneById, FindUserResponse>;
   findAll: handleUnaryCall<FindAllRequest, FindAllResponse>;
+  findByEmail: handleUnaryCall<FindOneByEmail, FindUserResponse>;
+  createUser: handleUnaryCall<CreateUserRequest, User>;
+  updateUser: handleUnaryCall<UpdateUserRequest, User>;
 }
 
 export interface UserServiceClient extends Client {
-  findOne(request: FindOneById, callback: (error: ServiceError | null, response: User) => void): ClientUnaryCall;
+  findOne(
+    request: FindOneById,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
+  ): ClientUnaryCall;
   findOne(
     request: FindOneById,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: User) => void,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
   ): ClientUnaryCall;
   findOne(
     request: FindOneById,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: User) => void,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
   ): ClientUnaryCall;
   findAll(
     request: FindAllRequest,
@@ -456,6 +826,51 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: FindAllResponse) => void,
+  ): ClientUnaryCall;
+  findByEmail(
+    request: FindOneByEmail,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
+  ): ClientUnaryCall;
+  findByEmail(
+    request: FindOneByEmail,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
+  ): ClientUnaryCall;
+  findByEmail(
+    request: FindOneByEmail,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: FindUserResponse) => void,
+  ): ClientUnaryCall;
+  createUser(
+    request: CreateUserRequest,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  createUser(
+    request: CreateUserRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  createUser(
+    request: CreateUserRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  updateUser(
+    request: UpdateUserRequest,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  updateUser(
+    request: UpdateUserRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  updateUser(
+    request: UpdateUserRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: User) => void,
   ): ClientUnaryCall;
 }
 

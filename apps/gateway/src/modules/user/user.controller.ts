@@ -1,33 +1,38 @@
-import { Controller, Get, Inject, OnModuleInit, Param } from '@nestjs/common';
-import { type ClientGrpc } from '@nestjs/microservices';
-import { lastValueFrom, Observable } from 'rxjs';
-import type { User } from '@proto/user';
-
-interface IUserService {
-  findOne(data: { id: string }): Observable<User>;
-  findAll(data: any): Observable<User[]>;
-}
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { lastValueFrom } from 'rxjs';
+import { UserService } from './user.service';
+import { CreateUserRequest, UpdateUserRequest, User } from '@proto/user';
 
 @Controller('users')
-export class UserController implements OnModuleInit {
-  private userService: IUserService;
-
-  constructor(@Inject('USER_PACKAGE') private client: ClientGrpc) {}
-
-  onModuleInit() {
-    this.userService = this.client.getService<IUserService>('UserService');
-  }
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getUsers() {
+  async getUsers(): Promise<User[]> {
     const users = await lastValueFrom(this.userService.findAll({}));
 
-    return users;
+    console.log('(GATEWAY - GET USERS) 📩 Response:', users);
+
+    return users.users;
   }
 
   @Get(':id')
   async getUser(@Param('id') id: string) {
     const result = await lastValueFrom(this.userService.findOne({ id }));
+
+    return result;
+  }
+
+  @Post()
+  async createUser(@Body() data: CreateUserRequest) {
+    const result = await lastValueFrom(this.userService.createUser(data));
+
+    return result;
+  }
+
+  @Put(':id')
+  async updateUser(@Param('id') id: string, @Body() data: UpdateUserRequest) {
+    const result = await lastValueFrom(this.userService.updateUser(data));
 
     return result;
   }

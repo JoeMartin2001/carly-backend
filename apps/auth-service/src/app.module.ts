@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule } from './infra/config/config.module';
+import { JwtModule } from './infra/jwt/jwt.module';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { ConfigModule } from './infra/config/config.module';
 
 @Module({
-  providers: [AuthService],
-  controllers: [AuthController],
+  providers: [AppService],
+  controllers: [AppController],
   imports: [
     ConfigModule,
     ClientsModule.register([
@@ -27,19 +26,7 @@ import { ConfigModule } from './infra/config/config.module';
     ]),
 
     PassportModule,
-    // TypeOrmModule.forFeature([
-    //   UserEntity,
-    //   // PasswordResetToken,
-    //   // EmailVerificationToken,
-    // ]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('app.jwtSecret'),
-        signOptions: { expiresIn: config.get<number>('app.jwtExpiresIn') },
-      }),
-    }),
+    JwtModule,
   ],
 })
 export class AppModule {}

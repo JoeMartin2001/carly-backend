@@ -11,5 +11,6 @@ import { typeOrmConfig } from './typeorm.config.ts.js';
       useFactory: (config: ConfigService) => typeOrmConfig(config),
     }),
   ],
+  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

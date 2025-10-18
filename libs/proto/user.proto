@@ -5,12 +5,36 @@ import "google/protobuf/timestamp.proto";
 package user;
 
 service UserService {
-    rpc FindOne (FindOneById) returns (User) {}
+    rpc FindOne (FindOneById) returns (FindUserResponse) {}
     rpc FindAll (FindAllRequest) returns (FindAllResponse) {}
+    rpc FindByEmail (FindOneByEmail) returns (FindUserResponse) {}
+    rpc CreateUser (CreateUserRequest) returns (User) {}
+    rpc UpdateUser (UpdateUserRequest) returns (User) {}
+}
+
+message FindUserResponse {
+  optional User user = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  optional string avatarUrl = 4;
+}
+
+message UpdateUserRequest {
+  optional string name = 1;
+  optional string email = 2;
+  optional string avatarUrl = 4;
 }
 
 message FindOneById {
-    string id = 1;
+  string id = 1;
+}
+
+message FindOneByEmail {
+  string email = 1;
 }
 
 message FindAllRequest {}

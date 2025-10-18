@@ -30,6 +30,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "compose:up": "docker-compose up --build",
     "compose:up:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "compose:down:dev": "docker compose -f docker-compose.dev.yml down",
     "compose:up:prod": "docker compose up --build -d",
     "compose:down": "docker-compose down",
     "compose:restart": "docker-compose down && docker-compose up --build -d",

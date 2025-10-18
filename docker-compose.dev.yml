@@ -27,6 +27,21 @@ services:
       - /usr/src/app/node_modules
     ports:
       - "50051:50051"
+    depends_on:
+      - user-service-db
+    networks:
+      - backend
+
+  user-service-db:
+    image: postgres:15
+    container_name: carly-user-service-db
+    restart: always
+    env_file:
+      - ./config/user-service/.env.dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - user-service-db-data:/var/lib/postgresql/data
     networks:
       - backend
 
@@ -47,3 +62,6 @@ services:
 networks:
   backend:
     driver: bridge
+
+volumes:
+  user-service-db-data:

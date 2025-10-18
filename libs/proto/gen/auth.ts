@@ -24,6 +24,8 @@ export const protobufPackage = "auth";
 export interface RegisterRequest {
   email: string;
   password: string;
+  name: string;
+  avatarUrl?: string | undefined;
 }
 
 export interface LoginRequest {
@@ -47,7 +49,7 @@ export interface VerifyTokenResponse {
 }
 
 function createBaseRegisterRequest(): RegisterRequest {
-  return { email: "", password: "" };
+  return { email: "", password: "", name: "", avatarUrl: undefined };
 }
 
 export const RegisterRequest: MessageFns<RegisterRequest> = {
@@ -57,6 +59,12 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     }
     if (message.password !== "") {
       writer.uint32(18).string(message.password);
+    }
+    if (message.name !== "") {
+      writer.uint32(26).string(message.name);
+    }
+    if (message.avatarUrl !== undefined) {
+      writer.uint32(34).string(message.avatarUrl);
     }
     return writer;
   },
@@ -84,6 +92,22 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
           message.password = reader.string();
           continue;
         }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.avatarUrl = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -97,6 +121,8 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     return {
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       password: isSet(object.password) ? globalThis.String(object.password) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      avatarUrl: isSet(object.avatarUrl) ? globalThis.String(object.avatarUrl) : undefined,
     };
   },
 
@@ -108,6 +134,12 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     if (message.password !== "") {
       obj.password = message.password;
     }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.avatarUrl !== undefined) {
+      obj.avatarUrl = message.avatarUrl;
+    }
     return obj;
   },
 
@@ -118,6 +150,8 @@ export const RegisterRequest: MessageFns<RegisterRequest> = {
     const message = createBaseRegisterRequest();
     message.email = object.email ?? "";
     message.password = object.password ?? "";
+    message.name = object.name ?? "";
+    message.avatarUrl = object.avatarUrl ?? undefined;
     return message;
   },
 };

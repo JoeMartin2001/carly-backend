@@ -13,5 +13,6 @@ import { validate } from './env.validation';
       envFilePath: ['config/auth-service/.env.auth.dev'],
     }),
   ],
+  exports: [NestConfigModule],
 })
 export class ConfigModule {}

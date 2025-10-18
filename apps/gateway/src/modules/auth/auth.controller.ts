@@ -6,19 +6,12 @@ import {
   Post,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
+import type { AuthResponse, LoginRequest, RegisterRequest } from '@proto/auth';
 import { lastValueFrom, Observable } from 'rxjs';
-import type {
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest,
-  VerifyTokenResponse,
-  VerifyTokenRequest,
-} from '@proto/auth';
 
 interface IAuthService {
   login(data: LoginRequest): Observable<AuthResponse>;
   register(data: RegisterRequest): Observable<AuthResponse>;
-  verifyToken(data: VerifyTokenRequest): Observable<VerifyTokenResponse>;
 }
 
 @Controller('auth')
@@ -44,6 +37,17 @@ export class AuthController {
     }
 
     const result = await lastValueFrom(this.authService.login(loginRequest));
+
+    return result;
+  }
+
+  @Post('register')
+  async register(@Body() registerRequest: RegisterRequest) {
+    console.log('📩 Received gRPC request:', registerRequest);
+
+    const result = await lastValueFrom(
+      this.authService.register(registerRequest),
+    );
 
     return result;
   }
