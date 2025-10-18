@@ -12,6 +12,7 @@ import type {
   FindUserResponse,
   DeleteUserResponse,
   DeleteUserRequest,
+  UpdateUserResponse,
 } from '@proto/user';
 import { status } from '@grpc/grpc-js';
 
@@ -27,7 +28,7 @@ export class AppController {
   }
 
   @GrpcMethod('UserService', 'UpdateUser')
-  async updateUser(request: UpdateUserRequest): Promise<FindUserResponse> {
+  async updateUser(request: UpdateUserRequest): Promise<UpdateUserResponse> {
     console.log('(USER - UPDATE...) 📩 Received gRPC request:', request);
 
     const result = await this.appService.updateUser(request);

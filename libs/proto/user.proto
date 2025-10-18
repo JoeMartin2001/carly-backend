@@ -29,6 +29,10 @@ message UpdateUserRequest {
   UserPartial data = 2;
 }
 
+message UpdateUserResponse {
+  optional User user = 1;
+}
+
 message UserPartial {
   optional string name = 1;
   optional string email = 2;

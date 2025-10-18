@@ -42,8 +42,6 @@ export class UserService {
   }
 
   updateUser(data: UpdateUserRequest) {
-    console.log('(GATEWAY - UPDATE USER) 📩 Received request:', data);
-
     return this.userService.updateUser(data);
   }
 
