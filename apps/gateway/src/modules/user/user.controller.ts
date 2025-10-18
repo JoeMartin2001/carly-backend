@@ -9,12 +9,7 @@ import {
 } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { UserService } from './user.service';
-import {
-  CreateUserRequest,
-  UpdateUserResponse,
-  User,
-  UserPartial,
-} from '@proto/user';
+import { CreateUserRequest, User, UserPartial } from '@proto/user';
 
 @Controller('users')
 export class UserController {
@@ -47,7 +42,7 @@ export class UserController {
   async updateUser(
     @Param('id') id: string,
     @Body() data: UserPartial,
-  ): Promise<UpdateUserResponse> {
+  ): Promise<User> {
     console.log('(GATEWAY - UPDATE USER) 📩 Received request:', data);
 
     const result = await lastValueFrom(
@@ -56,7 +51,7 @@ export class UserController {
 
     console.log('(GATEWAY - UPDATE USER) 📩 Response:', result);
 
-    return { user: result ?? undefined };
+    return result ?? undefined;
   }
 
   @Delete(':id')
