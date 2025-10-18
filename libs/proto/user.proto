@@ -10,6 +10,7 @@ service UserService {
     rpc FindByEmail (FindOneByEmail) returns (FindUserResponse) {}
     rpc CreateUser (CreateUserRequest) returns (User) {}
     rpc UpdateUser (UpdateUserRequest) returns (User) {}
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {}
 }
 
 message FindUserResponse {
@@ -24,6 +25,11 @@ message CreateUserRequest {
 }
 
 message UpdateUserRequest {
+  string id = 1;
+  UserPartial data = 2;
+}
+
+message UserPartial {
   optional string name = 1;
   optional string email = 2;
   optional string avatarUrl = 4;
@@ -41,6 +47,14 @@ message FindAllRequest {}
 
 message FindAllResponse {
   repeated User users = 1;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
 }
 
 message User {

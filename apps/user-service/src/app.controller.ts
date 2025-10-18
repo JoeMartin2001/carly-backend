@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { AppService } from './app.service';
 import type {
   FindOneById,
@@ -10,7 +10,10 @@ import type {
   FindOneByEmail,
   FindAllResponse,
   FindUserResponse,
+  DeleteUserResponse,
+  DeleteUserRequest,
 } from '@proto/user';
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 export class AppController {
@@ -24,14 +27,12 @@ export class AppController {
   }
 
   @GrpcMethod('UserService', 'UpdateUser')
-  async update(data: UpdateUserRequest): Promise<User> {
-    console.log('(USER - UPDATE) 📩 Received gRPC request:', data);
+  async updateUser(request: UpdateUserRequest): Promise<FindUserResponse> {
+    console.log('(USER - UPDATE...) 📩 Received gRPC request:', request);
 
-    const user = await this.appService.update(data);
+    const result = await this.appService.updateUser(request);
 
-    console.log('(USER - UPDATE) 📩 Response:', user);
-
-    return user;
+    return { user: result ?? undefined };
   }
 
   @GrpcMethod('UserService', 'FindOne')
@@ -67,5 +68,23 @@ export class AppController {
     console.log('(USER - FIND ALL) 📩 Response:', users);
 
     return { users };
+  }
+
+  @GrpcMethod('UserService', 'DeleteUser')
+  async deleteUser(data: DeleteUserRequest): Promise<DeleteUserResponse> {
+    const user = await this.appService.findOne(data.id);
+
+    if (!user) {
+      throw new RpcException({
+        code: status.NOT_FOUND,
+        message: 'User not found',
+      });
+    }
+
+    const result = await this.appService.remove(user.id);
+
+    const affected = result.affected ?? 0;
+
+    return { success: affected > 0 };
   }
 }

@@ -34,6 +34,11 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest {
+  id: string;
+  data: UserPartial | undefined;
+}
+
+export interface UserPartial {
   name?: string | undefined;
   email?: string | undefined;
   avatarUrl?: string | undefined;
@@ -52,6 +57,14 @@ export interface FindAllRequest {
 
 export interface FindAllResponse {
   users: User[];
+}
+
+export interface DeleteUserRequest {
+  id: string;
+}
+
+export interface DeleteUserResponse {
+  success: boolean;
 }
 
 export interface User {
@@ -233,11 +246,89 @@ export const CreateUserRequest: MessageFns<CreateUserRequest> = {
 };
 
 function createBaseUpdateUserRequest(): UpdateUserRequest {
-  return { name: undefined, email: undefined, avatarUrl: undefined };
+  return { id: "", data: undefined };
 }
 
 export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
   encode(message: UpdateUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.data !== undefined) {
+      UserPartial.encode(message.data, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.data = UserPartial.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateUserRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      data: isSet(object.data) ? UserPartial.fromJSON(object.data) : undefined,
+    };
+  },
+
+  toJSON(message: UpdateUserRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.data !== undefined) {
+      obj.data = UserPartial.toJSON(message.data);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(base?: I): UpdateUserRequest {
+    return UpdateUserRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(object: I): UpdateUserRequest {
+    const message = createBaseUpdateUserRequest();
+    message.id = object.id ?? "";
+    message.data = (object.data !== undefined && object.data !== null)
+      ? UserPartial.fromPartial(object.data)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUserPartial(): UserPartial {
+  return { name: undefined, email: undefined, avatarUrl: undefined };
+}
+
+export const UserPartial: MessageFns<UserPartial> = {
+  encode(message: UserPartial, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.name !== undefined) {
       writer.uint32(10).string(message.name);
     }
@@ -250,10 +341,10 @@ export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): UserPartial {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateUserRequest();
+    const message = createBaseUserPartial();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -290,7 +381,7 @@ export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
     return message;
   },
 
-  fromJSON(object: any): UpdateUserRequest {
+  fromJSON(object: any): UserPartial {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : undefined,
       email: isSet(object.email) ? globalThis.String(object.email) : undefined,
@@ -298,7 +389,7 @@ export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
     };
   },
 
-  toJSON(message: UpdateUserRequest): unknown {
+  toJSON(message: UserPartial): unknown {
     const obj: any = {};
     if (message.name !== undefined) {
       obj.name = message.name;
@@ -312,11 +403,11 @@ export const UpdateUserRequest: MessageFns<UpdateUserRequest> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(base?: I): UpdateUserRequest {
-    return UpdateUserRequest.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<UserPartial>, I>>(base?: I): UserPartial {
+    return UserPartial.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<UpdateUserRequest>, I>>(object: I): UpdateUserRequest {
-    const message = createBaseUpdateUserRequest();
+  fromPartial<I extends Exact<DeepPartial<UserPartial>, I>>(object: I): UserPartial {
+    const message = createBaseUserPartial();
     message.name = object.name ?? undefined;
     message.email = object.email ?? undefined;
     message.avatarUrl = object.avatarUrl ?? undefined;
@@ -537,6 +628,122 @@ export const FindAllResponse: MessageFns<FindAllResponse> = {
   fromPartial<I extends Exact<DeepPartial<FindAllResponse>, I>>(object: I): FindAllResponse {
     const message = createBaseFindAllResponse();
     message.users = object.users?.map((e) => User.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseDeleteUserRequest(): DeleteUserRequest {
+  return { id: "" };
+}
+
+export const DeleteUserRequest: MessageFns<DeleteUserRequest> = {
+  encode(message: DeleteUserRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteUserRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteUserRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteUserRequest>, I>>(base?: I): DeleteUserRequest {
+    return DeleteUserRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteUserRequest>, I>>(object: I): DeleteUserRequest {
+    const message = createBaseDeleteUserRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteUserResponse(): DeleteUserResponse {
+  return { success: false };
+}
+
+export const DeleteUserResponse: MessageFns<DeleteUserResponse> = {
+  encode(message: DeleteUserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteUserResponse {
+    return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
+  },
+
+  toJSON(message: DeleteUserResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<DeleteUserResponse>, I>>(base?: I): DeleteUserResponse {
+    return DeleteUserResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<DeleteUserResponse>, I>>(object: I): DeleteUserResponse {
+    const message = createBaseDeleteUserResponse();
+    message.success = object.success ?? false;
     return message;
   },
 };
@@ -786,6 +993,15 @@ export const UserServiceService = {
     responseSerialize: (value: User): Buffer => Buffer.from(User.encode(value).finish()),
     responseDeserialize: (value: Buffer): User => User.decode(value),
   },
+  deleteUser: {
+    path: "/user.UserService/DeleteUser",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: DeleteUserRequest): Buffer => Buffer.from(DeleteUserRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): DeleteUserRequest => DeleteUserRequest.decode(value),
+    responseSerialize: (value: DeleteUserResponse): Buffer => Buffer.from(DeleteUserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): DeleteUserResponse => DeleteUserResponse.decode(value),
+  },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
@@ -794,6 +1010,7 @@ export interface UserServiceServer extends UntypedServiceImplementation {
   findByEmail: handleUnaryCall<FindOneByEmail, FindUserResponse>;
   createUser: handleUnaryCall<CreateUserRequest, User>;
   updateUser: handleUnaryCall<UpdateUserRequest, User>;
+  deleteUser: handleUnaryCall<DeleteUserRequest, DeleteUserResponse>;
 }
 
 export interface UserServiceClient extends Client {
@@ -871,6 +1088,21 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: User) => void,
+  ): ClientUnaryCall;
+  deleteUser(
+    request: DeleteUserRequest,
+    callback: (error: ServiceError | null, response: DeleteUserResponse) => void,
+  ): ClientUnaryCall;
+  deleteUser(
+    request: DeleteUserRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: DeleteUserResponse) => void,
+  ): ClientUnaryCall;
+  deleteUser(
+    request: DeleteUserRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: DeleteUserResponse) => void,
   ): ClientUnaryCall;
 }
 

@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import {
   CreateUserRequest,
+  DeleteUserRequest,
+  DeleteUserResponse,
   FindAllRequest,
   FindAllResponse,
   UpdateUserRequest,
@@ -14,6 +16,7 @@ interface IUserService {
   findAll(data: FindAllRequest): Observable<FindAllResponse>;
   createUser(data: CreateUserRequest): Observable<User>;
   updateUser(data: UpdateUserRequest): Observable<User>;
+  deleteUser(data: DeleteUserRequest): Observable<DeleteUserResponse>;
 }
 
 @Injectable()
@@ -39,6 +42,12 @@ export class UserService {
   }
 
   updateUser(data: UpdateUserRequest) {
+    console.log('(GATEWAY - UPDATE USER) 📩 Received request:', data);
+
     return this.userService.updateUser(data);
+  }
+
+  deleteUser(data: DeleteUserRequest) {
+    return this.userService.deleteUser(data);
   }
 }

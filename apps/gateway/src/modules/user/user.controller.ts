@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 import { UserService } from './user.service';
-import { CreateUserRequest, UpdateUserRequest, User } from '@proto/user';
+import { CreateUserRequest, User, UserPartial } from '@proto/user';
 
 @Controller('users')
 export class UserController {
@@ -31,9 +39,22 @@ export class UserController {
   }
 
   @Put(':id')
-  async updateUser(@Param('id') id: string, @Body() data: UpdateUserRequest) {
-    const result = await lastValueFrom(this.userService.updateUser(data));
+  async updateUser(@Param('id') id: string, @Body() data: UserPartial) {
+    console.log('(GATEWAY - UPDATE USER) 📩 Received request:', data);
+
+    const result = await lastValueFrom(
+      this.userService.updateUser({ data, id }),
+    );
+
+    console.log('(GATEWAY - UPDATE USER) 📩 Response:', result);
 
     return result;
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string): Promise<boolean> {
+    const result = await lastValueFrom(this.userService.deleteUser({ id }));
+
+    return result.success;
   }
 }
