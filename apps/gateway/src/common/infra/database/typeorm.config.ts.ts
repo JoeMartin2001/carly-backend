@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Environment } from 'src/infra/config/env.validation';
-import { UserEntity } from 'src/common/common/entities/user.entity';
+import { UserEntity } from 'src/common/entities/user.entity';
 
 export const typeOrmConfig = (config: ConfigService): TypeOrmModuleOptions => ({
   type: 'postgres' as const,
