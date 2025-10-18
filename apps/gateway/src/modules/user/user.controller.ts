@@ -21,7 +21,7 @@ export class UserController {
 
     console.log('(GATEWAY - GET USERS) 📩 Response:', users);
 
-    return users.users;
+    return users.users || [];
   }
 
   @Get(':id')
