@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UserResolver } from './user.resolver';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './user.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
@@ -19,7 +18,6 @@ import { UserService } from './user.service';
         },
       },
     ]),
-    TypeOrmModule.forFeature([]),
   ],
   controllers: [UserController],
   providers: [UserResolver, UserService],

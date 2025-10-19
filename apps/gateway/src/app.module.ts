@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { GqlModule } from './infra/graphql/graphql.module';
 
 @Module({
-  imports: [UserModule, AuthModule],
+  imports: [GqlModule, UserModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

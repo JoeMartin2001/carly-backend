@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User as IUser } from '@proto/user';
-import { TableName } from 'src/infra/constants/TableName';
+import { TableName } from '../constants/TableName';
 
 @ObjectType()
 @Entity(TableName.USERS)
