@@ -7,12 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User as IUser } from '@proto/user';
 import { TableName } from '../constants/TableName';
 
 @ObjectType()
 @Entity(TableName.USERS)
-export class UserEntity implements IUser {
+export class UserEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;

@@ -3,7 +3,6 @@ import {
   CreateUserRequest,
   FindAllRequest,
   UpdateUserRequest,
-  User,
 } from '@proto/user';
 import { DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from './common/entities/user.entity';
@@ -16,11 +15,13 @@ export class AppService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(data: CreateUserRequest): Promise<User> {
+  async create(data: CreateUserRequest): Promise<UserEntity> {
     return await this.userRepository.save(data);
   }
 
-  async updateUser(request: UpdateUserRequest): Promise<User | undefined> {
+  async updateUser(
+    request: UpdateUserRequest,
+  ): Promise<UserEntity | undefined> {
     const { data = {}, id } = request;
 
     const existingUser = await this.userRepository.findOne({ where: { id } });
@@ -34,17 +35,17 @@ export class AppService {
     return updatedUser;
   }
 
-  findOne(id: string): Promise<User | null> {
+  findOne(id: string): Promise<UserEntity | null> {
     const user = this.userRepository.findOne({ where: { id } });
 
     return user;
   }
 
-  findAll(data: FindAllRequest = {}): Promise<User[]> {
+  findAll(data: FindAllRequest = {}): Promise<UserEntity[]> {
     return this.userRepository.find(data);
   }
 
-  findByEmail(email: string): Promise<User | null> {
+  findByEmail(email: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { email } });
   }
 

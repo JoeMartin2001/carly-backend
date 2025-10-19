@@ -1,12 +1,11 @@
 import { ObjectType, Field, ID, HideField } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { User as IUser } from '@proto/user';
 import { TableName } from 'src/common/constants/TableName';
 
 @ObjectType()
 @Entity(TableName.USERS)
-export class UserEntity implements IUser {
+export class UserEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id!: string;

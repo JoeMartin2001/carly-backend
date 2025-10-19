@@ -15,6 +15,7 @@ import type {
   UpdateUserResponse,
 } from '@proto/user';
 import { status } from '@grpc/grpc-js';
+import { toGrpcUser } from './common/utils/to-grpc-user';
 
 @Controller()
 export class AppController {
@@ -24,7 +25,8 @@ export class AppController {
   async createUser(data: CreateUserRequest): Promise<User> {
     console.log('(USER - CREATE) 📩 Received gRPC request:', data);
 
-    return await this.appService.create(data);
+    const user = await this.appService.create(data);
+    return toGrpcUser(user);
   }
 
   @GrpcMethod('UserService', 'UpdateUser')
@@ -33,7 +35,7 @@ export class AppController {
 
     const result = await this.appService.updateUser(request);
 
-    return { user: result ?? undefined };
+    return { user: result ? toGrpcUser(result) : undefined };
   }
 
   @GrpcMethod('UserService', 'FindOne')
@@ -44,7 +46,7 @@ export class AppController {
 
     console.log('(USER - FIND ONE) 📩 Response:', user);
 
-    return { user: user ?? undefined };
+    return { user: user ? toGrpcUser(user) : undefined };
   }
 
   @GrpcMethod('UserService', 'FindByEmail')
@@ -55,7 +57,7 @@ export class AppController {
 
     console.log('(USER - FIND ONE BY EMAIL) 📩 Response:', user);
 
-    return { user: user ?? undefined };
+    return { user: user ? toGrpcUser(user) : undefined };
   }
 
   @GrpcMethod('UserService', 'FindAll')
@@ -68,7 +70,7 @@ export class AppController {
 
     console.log('(USER - FIND ALL) 📩 Response:', users);
 
-    return { users };
+    return { users: users.map(toGrpcUser) };
   }
 
   @GrpcMethod('UserService', 'DeleteUser')
