@@ -1,11 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthResponse, LoginRequest } from '@proto/auth';
 import {
@@ -17,7 +10,8 @@ import {
   User,
 } from '@proto/user';
 import { lastValueFrom, Observable } from 'rxjs';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 interface IUserService {
   findOne(data: FindOneById): Observable<FindUserResponse>;
@@ -47,13 +41,19 @@ export class AppService {
     );
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new RpcException({
+        code: status.NOT_FOUND, // 5 = NOT_FOUND
+        message: 'User not found',
+      });
     }
 
     console.log('user', user);
 
     if (user.password !== data.password) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new RpcException({
+        code: status.UNAUTHENTICATED, // 16 = UNAUTHENTICATED
+        message: 'Invalid credentials',
+      });
     }
 
     const { accessToken, refreshToken } = await this.signPair({
@@ -75,7 +75,10 @@ export class AppService {
     );
 
     if (user) {
-      throw new ConflictException('User already exists');
+      throw new RpcException({
+        message: 'User already exists',
+        code: status.ALREADY_EXISTS, // 11 = ALREADY_EXISTS
+      });
     }
 
     console.log('user', user);
@@ -85,7 +88,10 @@ export class AppService {
     console.log('newUser', newUser);
 
     if (!newUser) {
-      throw new InternalServerErrorException('Failed to create user');
+      throw new RpcException({
+        message: 'Failed to create user',
+        code: status.INTERNAL, // 13 = INTERNAL
+      });
     }
 
     const { accessToken, refreshToken } = await this.signPair({
