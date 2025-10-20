@@ -12,6 +12,7 @@ import {
 import { lastValueFrom, Observable } from 'rxjs';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
+import * as bcrypt from 'bcrypt';
 
 interface IUserService {
   findOne(data: FindOneById): Observable<FindUserResponse>;
@@ -33,6 +34,7 @@ export class AppService {
     this.userService = this.client.getService<IUserService>('UserService');
   }
 
+  // LOGIN
   async login(data: LoginRequest): Promise<AuthResponse> {
     console.log('📩 Received gRPC request:', data);
 
@@ -47,9 +49,9 @@ export class AppService {
       });
     }
 
-    console.log('user', user);
+    const isPasswordValid = await bcrypt.compare(data.password, user.password);
 
-    if (user.password !== data.password) {
+    if (!isPasswordValid) {
       throw new RpcException({
         code: status.UNAUTHENTICATED, // 16 = UNAUTHENTICATED
         message: 'Invalid credentials',
@@ -61,14 +63,13 @@ export class AppService {
       email: user.email,
     });
 
-    console.log('accessToken', accessToken);
-
     return {
       accessToken,
       refreshToken,
     };
   }
 
+  // REGISTER
   async register(data: CreateUserRequest): Promise<AuthResponse> {
     const { user } = await lastValueFrom(
       this.userService.findByEmail({ email: data.email }),
@@ -81,11 +82,18 @@ export class AppService {
       });
     }
 
-    console.log('user', user);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    const newUser = await lastValueFrom(this.userService.createUser(data));
+    const newUserRequest: CreateUserRequest = {
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+      avatarUrl: data.avatarUrl,
+    };
 
-    console.log('newUser', newUser);
+    const newUser = await lastValueFrom(
+      this.userService.createUser(newUserRequest),
+    );
 
     if (!newUser) {
       throw new RpcException({
@@ -102,6 +110,7 @@ export class AppService {
     return { accessToken, refreshToken };
   }
 
+  // SIGN PAIR (ACCESS TOKEN AND REFRESH TOKEN)
   private async signPair(user: { id: string; email: string }) {
     const payload = { sub: user.id, email: user.email };
 
@@ -113,5 +122,32 @@ export class AppService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  // REFRESH TOKEN
+  async refreshToken(token: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync<{
+        sub: string;
+        email: string;
+      }>(token);
+
+      const { accessToken, refreshToken } = await this.signPair({
+        id: payload.sub,
+        email: payload.email,
+      });
+
+      return {
+        accessToken,
+        refreshToken,
+        user: payload,
+      };
+    } catch (error) {
+      console.error('[AUTH] Refresh token validation failed:', error);
+      throw new RpcException({
+        code: status.UNAUTHENTICATED, // 16 = UNAUTHENTICATED
+        message: 'Invalid or expired refresh token',
+      });
+    }
   }
 }

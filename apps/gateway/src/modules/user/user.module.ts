@@ -17,6 +17,15 @@ import { UserService } from './user.service';
           url: process.env.USER_SERVICE_URL,
         },
       },
+      {
+        name: 'AUTH_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'auth',
+          protoPath: join(process.cwd(), 'libs/proto/auth.proto'),
+          url: process.env.AUTH_SERVICE_URL,
+        },
+      },
     ]),
   ],
   controllers: [UserController],

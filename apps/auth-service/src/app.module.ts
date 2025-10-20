@@ -7,12 +7,15 @@ import { AppController } from './app.controller';
 import { ClientsModule } from '@nestjs/microservices';
 import { Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { UserService } from './modules/user/user.service';
 
 @Module({
-  providers: [AppService],
+  providers: [AppService, UserService],
   controllers: [AppController],
   imports: [
     ConfigModule,
+    PassportModule,
+    JwtModule,
     ClientsModule.register([
       {
         name: 'USER_PACKAGE',
@@ -24,9 +27,6 @@ import { join } from 'path';
         },
       },
     ]),
-
-    PassportModule,
-    JwtModule,
   ],
 })
 export class AppModule {}

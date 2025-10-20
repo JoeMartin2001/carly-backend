@@ -1,22 +1,61 @@
-// import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-// import { GqlExecutionContext } from '@nestjs/graphql';
-// import { AuthServiceClient } from '@proto/auth';
-// import { lastValueFrom } from 'rxjs';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { lastValueFrom, Observable } from 'rxjs';
+import { ValidateTokenRequest, ValidateTokenResponse } from '@proto/auth'; // your generated gRPC client interface
+import { Request } from 'express';
+import { ClientGrpc } from '@nestjs/microservices';
 
-// @Injectable()
-// export class GqlAuthGuard implements CanActivate {
-//   constructor(private readonly authClient: AuthServiceClient) {}
+interface IAuthService {
+  validateToken(data: ValidateTokenRequest): Observable<ValidateTokenResponse>;
+}
 
-//   async canActivate(context: ExecutionContext): Promise<boolean> {
-//     const ctx = GqlExecutionContext.create(context);
-//     const { req } = ctx.getContext();
-//     const token = req.headers.authorization?.split(' ')[1];
+@Injectable()
+export class GqlAuthGuard implements CanActivate {
+  private authService: IAuthService;
 
-//     if (!token) return false;
+  constructor(@Inject('AUTH_PACKAGE') private client: ClientGrpc) {}
 
-//     const res = await lastValueFrom(this.authClient.verifyToken({ token }));
-//     req.user = res;
+  onModuleInit() {
+    this.authService = this.client.getService<IAuthService>('AuthService');
+  }
 
-//     return res.valid;
-//   }
-// }
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const ctx = GqlExecutionContext.create(context);
+    const req = ctx.getContext<{ req: Request }>().req;
+
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+      throw new UnauthorizedException('Missing authorization header');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+      throw new UnauthorizedException('Invalid authorization header');
+    }
+
+    try {
+      // ✅ Call AuthService gRPC validate method
+      const { user } = await lastValueFrom<ValidateTokenResponse>(
+        this.authService.validateToken({ token }),
+      );
+
+      if (!user) throw new UnauthorizedException('Invalid token');
+
+      // Attach user to GraphQL context
+      req.user = user;
+
+      return true;
+    } catch (error) {
+      console.error('[GATEWAY] Auth validation failed:', error);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+}

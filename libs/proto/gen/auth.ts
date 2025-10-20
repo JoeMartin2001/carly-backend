@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { User } from "./user";
 
 export const protobufPackage = "auth";
 
@@ -38,13 +39,26 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
-export interface VerifyTokenRequest {
+export interface ValidateTokenRequest {
   token: string;
 }
 
-export interface VerifyTokenResponse {
-  valid: boolean;
-  userId: string;
+export interface ValidateTokenResponse {
+  user?: User | undefined;
+}
+
+export interface RefreshTokenRequest {
+  token: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  user?: JwtPayload | undefined;
+}
+
+export interface JwtPayload {
+  sub: string;
   email: string;
 }
 
@@ -308,22 +322,22 @@ export const AuthResponse: MessageFns<AuthResponse> = {
   },
 };
 
-function createBaseVerifyTokenRequest(): VerifyTokenRequest {
+function createBaseValidateTokenRequest(): ValidateTokenRequest {
   return { token: "" };
 }
 
-export const VerifyTokenRequest: MessageFns<VerifyTokenRequest> = {
-  encode(message: VerifyTokenRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const ValidateTokenRequest: MessageFns<ValidateTokenRequest> = {
+  encode(message: ValidateTokenRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.token !== "") {
       writer.uint32(10).string(message.token);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): VerifyTokenRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): ValidateTokenRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseVerifyTokenRequest();
+    const message = createBaseValidateTokenRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -344,11 +358,11 @@ export const VerifyTokenRequest: MessageFns<VerifyTokenRequest> = {
     return message;
   },
 
-  fromJSON(object: any): VerifyTokenRequest {
+  fromJSON(object: any): ValidateTokenRequest {
     return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
   },
 
-  toJSON(message: VerifyTokenRequest): unknown {
+  toJSON(message: ValidateTokenRequest): unknown {
     const obj: any = {};
     if (message.token !== "") {
       obj.token = message.token;
@@ -356,47 +370,163 @@ export const VerifyTokenRequest: MessageFns<VerifyTokenRequest> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<VerifyTokenRequest>, I>>(base?: I): VerifyTokenRequest {
-    return VerifyTokenRequest.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<ValidateTokenRequest>, I>>(base?: I): ValidateTokenRequest {
+    return ValidateTokenRequest.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<VerifyTokenRequest>, I>>(object: I): VerifyTokenRequest {
-    const message = createBaseVerifyTokenRequest();
+  fromPartial<I extends Exact<DeepPartial<ValidateTokenRequest>, I>>(object: I): ValidateTokenRequest {
+    const message = createBaseValidateTokenRequest();
     message.token = object.token ?? "";
     return message;
   },
 };
 
-function createBaseVerifyTokenResponse(): VerifyTokenResponse {
-  return { valid: false, userId: "", email: "" };
+function createBaseValidateTokenResponse(): ValidateTokenResponse {
+  return { user: undefined };
 }
 
-export const VerifyTokenResponse: MessageFns<VerifyTokenResponse> = {
-  encode(message: VerifyTokenResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.valid !== false) {
-      writer.uint32(8).bool(message.valid);
-    }
-    if (message.userId !== "") {
-      writer.uint32(18).string(message.userId);
-    }
-    if (message.email !== "") {
-      writer.uint32(26).string(message.email);
+export const ValidateTokenResponse: MessageFns<ValidateTokenResponse> = {
+  encode(message: ValidateTokenResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.user !== undefined) {
+      User.encode(message.user, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): VerifyTokenResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): ValidateTokenResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseVerifyTokenResponse();
+    const message = createBaseValidateTokenResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1: {
-          if (tag !== 8) {
+          if (tag !== 10) {
             break;
           }
 
-          message.valid = reader.bool();
+          message.user = User.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ValidateTokenResponse {
+    return { user: isSet(object.user) ? User.fromJSON(object.user) : undefined };
+  },
+
+  toJSON(message: ValidateTokenResponse): unknown {
+    const obj: any = {};
+    if (message.user !== undefined) {
+      obj.user = User.toJSON(message.user);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ValidateTokenResponse>, I>>(base?: I): ValidateTokenResponse {
+    return ValidateTokenResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ValidateTokenResponse>, I>>(object: I): ValidateTokenResponse {
+    const message = createBaseValidateTokenResponse();
+    message.user = (object.user !== undefined && object.user !== null) ? User.fromPartial(object.user) : undefined;
+    return message;
+  },
+};
+
+function createBaseRefreshTokenRequest(): RefreshTokenRequest {
+  return { token: "" };
+}
+
+export const RefreshTokenRequest: MessageFns<RefreshTokenRequest> = {
+  encode(message: RefreshTokenRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.token !== "") {
+      writer.uint32(10).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RefreshTokenRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRefreshTokenRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RefreshTokenRequest {
+    return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
+  },
+
+  toJSON(message: RefreshTokenRequest): unknown {
+    const obj: any = {};
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RefreshTokenRequest>, I>>(base?: I): RefreshTokenRequest {
+    return RefreshTokenRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RefreshTokenRequest>, I>>(object: I): RefreshTokenRequest {
+    const message = createBaseRefreshTokenRequest();
+    message.token = object.token ?? "";
+    return message;
+  },
+};
+
+function createBaseRefreshTokenResponse(): RefreshTokenResponse {
+  return { accessToken: "", refreshToken: "", user: undefined };
+}
+
+export const RefreshTokenResponse: MessageFns<RefreshTokenResponse> = {
+  encode(message: RefreshTokenResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.accessToken !== "") {
+      writer.uint32(10).string(message.accessToken);
+    }
+    if (message.refreshToken !== "") {
+      writer.uint32(18).string(message.refreshToken);
+    }
+    if (message.user !== undefined) {
+      JwtPayload.encode(message.user, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RefreshTokenResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRefreshTokenResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.accessToken = reader.string();
           continue;
         }
         case 2: {
@@ -404,11 +534,94 @@ export const VerifyTokenResponse: MessageFns<VerifyTokenResponse> = {
             break;
           }
 
-          message.userId = reader.string();
+          message.refreshToken = reader.string();
           continue;
         }
         case 3: {
           if (tag !== 26) {
+            break;
+          }
+
+          message.user = JwtPayload.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RefreshTokenResponse {
+    return {
+      accessToken: isSet(object.accessToken) ? globalThis.String(object.accessToken) : "",
+      refreshToken: isSet(object.refreshToken) ? globalThis.String(object.refreshToken) : "",
+      user: isSet(object.user) ? JwtPayload.fromJSON(object.user) : undefined,
+    };
+  },
+
+  toJSON(message: RefreshTokenResponse): unknown {
+    const obj: any = {};
+    if (message.accessToken !== "") {
+      obj.accessToken = message.accessToken;
+    }
+    if (message.refreshToken !== "") {
+      obj.refreshToken = message.refreshToken;
+    }
+    if (message.user !== undefined) {
+      obj.user = JwtPayload.toJSON(message.user);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RefreshTokenResponse>, I>>(base?: I): RefreshTokenResponse {
+    return RefreshTokenResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RefreshTokenResponse>, I>>(object: I): RefreshTokenResponse {
+    const message = createBaseRefreshTokenResponse();
+    message.accessToken = object.accessToken ?? "";
+    message.refreshToken = object.refreshToken ?? "";
+    message.user = (object.user !== undefined && object.user !== null)
+      ? JwtPayload.fromPartial(object.user)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseJwtPayload(): JwtPayload {
+  return { sub: "", email: "" };
+}
+
+export const JwtPayload: MessageFns<JwtPayload> = {
+  encode(message: JwtPayload, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.sub !== "") {
+      writer.uint32(10).string(message.sub);
+    }
+    if (message.email !== "") {
+      writer.uint32(18).string(message.email);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): JwtPayload {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseJwtPayload();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.sub = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
             break;
           }
 
@@ -424,21 +637,17 @@ export const VerifyTokenResponse: MessageFns<VerifyTokenResponse> = {
     return message;
   },
 
-  fromJSON(object: any): VerifyTokenResponse {
+  fromJSON(object: any): JwtPayload {
     return {
-      valid: isSet(object.valid) ? globalThis.Boolean(object.valid) : false,
-      userId: isSet(object.userId) ? globalThis.String(object.userId) : "",
+      sub: isSet(object.sub) ? globalThis.String(object.sub) : "",
       email: isSet(object.email) ? globalThis.String(object.email) : "",
     };
   },
 
-  toJSON(message: VerifyTokenResponse): unknown {
+  toJSON(message: JwtPayload): unknown {
     const obj: any = {};
-    if (message.valid !== false) {
-      obj.valid = message.valid;
-    }
-    if (message.userId !== "") {
-      obj.userId = message.userId;
+    if (message.sub !== "") {
+      obj.sub = message.sub;
     }
     if (message.email !== "") {
       obj.email = message.email;
@@ -446,13 +655,12 @@ export const VerifyTokenResponse: MessageFns<VerifyTokenResponse> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<VerifyTokenResponse>, I>>(base?: I): VerifyTokenResponse {
-    return VerifyTokenResponse.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<JwtPayload>, I>>(base?: I): JwtPayload {
+    return JwtPayload.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<VerifyTokenResponse>, I>>(object: I): VerifyTokenResponse {
-    const message = createBaseVerifyTokenResponse();
-    message.valid = object.valid ?? false;
-    message.userId = object.userId ?? "";
+  fromPartial<I extends Exact<DeepPartial<JwtPayload>, I>>(object: I): JwtPayload {
+    const message = createBaseJwtPayload();
+    message.sub = object.sub ?? "";
     message.email = object.email ?? "";
     return message;
   },
@@ -478,21 +686,22 @@ export const AuthServiceService = {
     responseSerialize: (value: AuthResponse): Buffer => Buffer.from(AuthResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): AuthResponse => AuthResponse.decode(value),
   },
-  verifyToken: {
-    path: "/auth.AuthService/VerifyToken",
+  validateToken: {
+    path: "/auth.AuthService/ValidateToken",
     requestStream: false,
     responseStream: false,
-    requestSerialize: (value: VerifyTokenRequest): Buffer => Buffer.from(VerifyTokenRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): VerifyTokenRequest => VerifyTokenRequest.decode(value),
-    responseSerialize: (value: VerifyTokenResponse): Buffer => Buffer.from(VerifyTokenResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): VerifyTokenResponse => VerifyTokenResponse.decode(value),
+    requestSerialize: (value: ValidateTokenRequest): Buffer => Buffer.from(ValidateTokenRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): ValidateTokenRequest => ValidateTokenRequest.decode(value),
+    responseSerialize: (value: ValidateTokenResponse): Buffer =>
+      Buffer.from(ValidateTokenResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): ValidateTokenResponse => ValidateTokenResponse.decode(value),
   },
 } as const;
 
 export interface AuthServiceServer extends UntypedServiceImplementation {
   register: handleUnaryCall<RegisterRequest, AuthResponse>;
   login: handleUnaryCall<LoginRequest, AuthResponse>;
-  verifyToken: handleUnaryCall<VerifyTokenRequest, VerifyTokenResponse>;
+  validateToken: handleUnaryCall<ValidateTokenRequest, ValidateTokenResponse>;
 }
 
 export interface AuthServiceClient extends Client {
@@ -523,20 +732,20 @@ export interface AuthServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: AuthResponse) => void,
   ): ClientUnaryCall;
-  verifyToken(
-    request: VerifyTokenRequest,
-    callback: (error: ServiceError | null, response: VerifyTokenResponse) => void,
+  validateToken(
+    request: ValidateTokenRequest,
+    callback: (error: ServiceError | null, response: ValidateTokenResponse) => void,
   ): ClientUnaryCall;
-  verifyToken(
-    request: VerifyTokenRequest,
+  validateToken(
+    request: ValidateTokenRequest,
     metadata: Metadata,
-    callback: (error: ServiceError | null, response: VerifyTokenResponse) => void,
+    callback: (error: ServiceError | null, response: ValidateTokenResponse) => void,
   ): ClientUnaryCall;
-  verifyToken(
-    request: VerifyTokenRequest,
+  validateToken(
+    request: ValidateTokenRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: VerifyTokenResponse) => void,
+    callback: (error: ServiceError | null, response: ValidateTokenResponse) => void,
   ): ClientUnaryCall;
 }
 

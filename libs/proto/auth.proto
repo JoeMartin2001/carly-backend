@@ -1,11 +1,13 @@
 syntax = "proto3";
 
+import "user.proto";
+
 package auth;
 
 service AuthService {
   rpc Register (RegisterRequest) returns (AuthResponse) {};
   rpc Login (LoginRequest) returns (AuthResponse) {};
-  rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse) {};
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse) {}
 }
 
 message RegisterRequest {
@@ -25,12 +27,25 @@ message AuthResponse {
   string refreshToken = 2;
 }
 
-message VerifyTokenRequest {
+message ValidateTokenRequest {
   string token = 1;
 }
 
-message VerifyTokenResponse {
-  bool valid = 1;
-  string userId = 2;
-  string email = 3;
+message ValidateTokenResponse {
+  optional user.User user = 1;
+}
+
+message RefreshTokenRequest {
+  string token = 1;
+}
+
+message RefreshTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+  optional JwtPayload user = 3;
+}
+
+message JwtPayload {
+  string sub = 1;
+  string email = 2;
 }

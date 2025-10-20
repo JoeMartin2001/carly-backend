@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserEntity } from 'src/common/entities/user.entity';
 import { AuthService } from './auth.service';
 import { RegisterInput } from './dto/register.input';
@@ -9,7 +9,13 @@ import {
   BadRequestException,
   NotFoundException,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/common/guards/gql-auth.guard';
+import { User } from '@proto/user';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { toUserEntity } from 'src/common/utils/to-user-entity';
+import { RefreshTokenRequest, RefreshTokenResponse } from '@proto/auth';
 
 @Resolver(() => UserEntity)
 export class AuthResolver {
@@ -68,5 +74,46 @@ export class AuthResolver {
     );
 
     return result;
+  }
+
+  @Mutation(() => AuthResponseEntity)
+  async refreshToken(
+    @Args('refreshTokenInput', { type: () => RefreshTokenRequest })
+    request: RefreshTokenRequest,
+  ): Promise<AuthResponseEntity> {
+    console.log('📩 Received gRPC request:', request);
+
+    if (!request) {
+      throw new BadRequestException('Invalid request body');
+    }
+
+    try {
+      const result = await lastValueFrom<RefreshTokenResponse>(
+        this.authService.refreshToken(request),
+      );
+
+      return result;
+    } catch (error: unknown) {
+      console.error('[Gateway] gRPC error:', error);
+
+      const castedError = error as {
+        code: number;
+        details: string;
+      };
+
+      if (castedError.code === 16) {
+        throw new UnauthorizedException(castedError.details);
+      }
+
+      throw new BadRequestException(
+        castedError.details || 'Internal server error',
+      );
+    }
+  }
+
+  @Query(() => UserEntity)
+  @UseGuards(GqlAuthGuard)
+  me(@CurrentUser() user: User) {
+    return toUserEntity(user);
   }
 }

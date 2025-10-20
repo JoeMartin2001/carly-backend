@@ -6,12 +6,15 @@ import { DeleteUserResponse } from '@proto/user';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { toUserEntity } from 'src/common/utils/to-user-entity';
+import { GqlAuthGuard } from 'src/common/guards/gql-auth.guard';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver(() => UserEntity)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => [UserEntity])
+  @UseGuards(GqlAuthGuard)
   async users(): Promise<UserEntity[]> {
     const users = await lastValueFrom(this.userService.findAll({}));
 
